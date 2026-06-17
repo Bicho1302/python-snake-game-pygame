@@ -27,7 +27,7 @@ class Snake:
         self.body = [(WIDTH // 2, HEIGHT // 2)]
         self.direction = (CELL_SIZE, 0)
         self.grow_next = False
-
+# Move the snake in the current direction.
     def move(self):
         head_x, head_y = self.body[0]
         dx, dy = self.direction
@@ -38,21 +38,21 @@ class Snake:
             self.grow_next = False
         else:
             self.body.pop()
-
+#Increase the snake length after eating food.
     def grow(self):
         self.grow_next = True
-
+#Prevent the snake from reversing direction.
     def change_direction(self, new_direction):
         dx, dy = self.direction
         ndx, ndy = new_direction
         if (dx + ndx, dy + ndy) != (0, 0):
             self.direction = new_direction
-
+#Draw the snake on the screen
     def draw(self):
         for index, segment in enumerate(self.body):
             color = DARK_GREEN if index == 0 else GREEN
             pygame.draw.rect(screen, color, (*segment, CELL_SIZE, CELL_SIZE))
-
+#Check if the snake has hit the wall or itself.
     def hit_wall(self):
         head_x, head_y = self.body[0]
         return head_x < 0 or head_x >= WIDTH or head_y < 0 or head_y >= HEIGHT
@@ -64,17 +64,17 @@ class Snake:
 class Food:
     def __init__(self, snake_body):
         self.position = self.random_position(snake_body)
-
+#Generate a random position for the food that is not occupied by the snake.
     def random_position(self, snake_body):
         while True:
             x = random.randrange(0, WIDTH, CELL_SIZE)
             y = random.randrange(0, HEIGHT, CELL_SIZE)
             if (x, y) not in snake_body:
                 return (x, y)
-
+#Respawn the food at a new random position after being eaten.
     def respawn(self, snake_body):
         self.position = self.random_position(snake_body)
-
+#Draw the food on the screen.
     def draw(self):
         pygame.draw.rect(screen, RED, (*self.position, CELL_SIZE, CELL_SIZE))
 
@@ -84,7 +84,7 @@ class Game:
         self.high_score = 0
         self.start_new_game()
         self.started = False
-
+#Start a new game by initializing the snake, food, score, level, speed, and game over state.
     def start_new_game(self):
         self.snake = Snake()
         self.food = Food(self.snake.body)
@@ -92,10 +92,10 @@ class Game:
         self.level = 1
         self.speed = FPS_START
         self.game_over = False
-
+#Reset the game to the initial state when the player chooses to restart after a game over.
     def reset(self):
         self.start_new_game()
-
+#Handle user input for starting the game, changing the snake's direction, and restarting after a game over.
     def handle_input(self, event):
         if event.type == pygame.KEYDOWN:
             if not self.started and event.key == pygame.K_SPACE:
@@ -111,7 +111,7 @@ class Game:
                 self.snake.change_direction((CELL_SIZE, 0))
             elif event.key == pygame.K_r and self.game_over:
                 self.reset()
-
+#Update the game state by moving the snake, checking for food collisions, updating the score and level, and checking for game over conditions.
     def update(self):
         if not self.started or self.game_over:
             return
@@ -130,11 +130,11 @@ class Game:
 
         if self.snake.hit_wall() or self.snake.hit_self():
             self.game_over = True
-
+#Update the game level and speed based on the current score. The level increases every 5 points, and the speed increases by 2 FPS for each new level.
     def update_level(self):
         self.level = 1 + self.score // 5
         self.speed = FPS_START + (self.level - 1) * 2
-
+#Draw text on the screen at the specified position with the given font and color.
     def draw_text(self, text, font_obj, color, x, y):
         surface = font_obj.render(text, True, color)
         screen.blit(surface, (x, y))
@@ -153,7 +153,7 @@ class Game:
         self.draw_text(f"Level: {self.level}", font, WHITE, 10, 45)
         self.draw_text(f"Speed: {self.speed}", font, WHITE, 10, 80)
         self.draw_text(f"High Score: {self.high_score}", font, WHITE, 10, 115)
-
+#Draw the game over screen with a semi-transparent overlay and display the final score, high score, and instructions to restart.
     def draw_game_over(self):
         overlay = pygame.Surface((WIDTH, HEIGHT))
         overlay.set_alpha(180)
@@ -164,7 +164,7 @@ class Game:
         self.draw_text(f"Final Score: {self.score}", font, WHITE, WIDTH // 2 - 90, HEIGHT // 2 - 25)
         self.draw_text(f"High Score: {self.high_score}", font, WHITE, WIDTH // 2 - 95, HEIGHT // 2 + 15)
         self.draw_text("Press R to Restart", font, BLUE, WIDTH // 2 - 110, HEIGHT // 2 + 60)
-
+#Draw the current game state, including the start screen, game elements (snake and food), HUD, and game over screen if applicable.
     def draw(self):
         if not self.started:
             self.draw_start_screen()
@@ -180,7 +180,7 @@ class Game:
 
         pygame.display.flip()
 
-
+#The main function initializes the game and runs the main game loop, which handles events, updates the game state, and draws the game elements on the screen until the player quits.
 def main():
     game = Game()
     running = True
